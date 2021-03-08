@@ -1,0 +1,15 @@
+Test Plan
+---------
+
+Primary Shopper: Test Guest	
+Household ID: 9169
+Household Size: 	5
+Males:				3
+	teen-adults:1
+	youth: 1
+	infants:1
+Females: 			2
+	teen-adults: 2	
+Incontinence
+	Youth: 1
+	teen-adult: 1
