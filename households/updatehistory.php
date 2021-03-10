@@ -56,8 +56,11 @@
 // write user log			
 		if (!$control['err'] && !isset($_POST['copy'])) { 
 			$date = date('Y-m-d');
-			$time = date('H:i:s');			
-			writeUserLog( $control['db'], $date, $time, $control['hhID'], "consumption", 0, "UPDATE SHOPPING", $_POST['date'], $_POST['time']);
+			$time = date('H:i:s');		
+
+// 3-10-2021: write ID of household being updated, not ID of household in memory.		-mlr	
+//			writeUserLog( $control['db'], $date, $time, $control['hhID'], "consumption", 0, "UPDATE SHOPPING", $_POST['date'], $_POST['time']);
+			writeUserLog( $control['db'], $date, $time, $_POST['household_id'], "consumption", 0, "UPDATE SHOPPING", $_POST['date'], $_POST['time']);			
 		}	
 	}	
 	
