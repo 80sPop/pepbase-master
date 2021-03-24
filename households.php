@@ -17,6 +17,14 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
+ * 3-22-2021: v 4.1 update 
+ *		
+ *		when editing household profile data (contact, literacy, and registration):
+ *			- correctly display errors
+ *			- don't write to user log when input has errors		
+ *			- don't display search bar with input forms
+ *			- add household name to input forms  -mlr
+ *
 */ 
 
 	require_once('config.php'); 
@@ -90,23 +98,25 @@
 
 	} else {
 		
-		if ($control['tab'] != "history")
-			doSearchBar();
-		
 		if ($control['tab'] == "profile") {	
 		
-			if (isset($_GET['editContact']))
+// 3-22-2021: v 4.1 update - correctly display household contact edit errors.	-mlr		
+			$isEditContactError = (isset($_POST['saveContact']) && $control['errCode'] > 0);		
+			if ( isset($_GET['editContact']) || $isEditContactError )
 				contactForm($errMsg);
 			elseif (isset($_GET['editLit']))
 				literacyForm();		
 			elseif (isset($_GET['editId']))
 				idForm();				
-			elseif ( $control['hhID'] > 0 ) { 
-				viewAvatar();
-				doHHNavBar();
-				viewProfile();			
-			} else	
-				noHouseholdMsg();
+			else {
+				doSearchBar();				
+				if ( $control['hhID'] > 0 ) { 
+					viewAvatar();
+					doHHNavBar();
+					viewProfile();			
+				} else	
+					noHouseholdMsg();
+			}	
 	
 		} elseif ($control['tab'] == "members") {
 		
@@ -114,15 +124,19 @@
 				membersForm("add", $errMsg);
 			elseif (isset($_GET['edit']))
 				membersForm("edit", $errMsg);			
-			elseif ( $control['hhID'] > 0 ) {
-				viewAvatar();
-				doHHNavBar();				
-				viewMembers();	
-			} else	
-				noHouseholdMsg();	
+			else {
+				doSearchBar();
+				if ( $control['hhID'] > 0 ) {
+					viewAvatar();
+					doHHNavBar();				
+					viewMembers();	
+				} else	
+					noHouseholdMsg();
+			}	
 		
 		} elseif ($control['tab'] == "eligibility") {
-		
+			
+			doSearchBar();		
 			if ( $control['hhID'] > 0 ) { 
 				viewAvatar();
 				doHHNavBar();
@@ -857,7 +871,7 @@ function updateContact() {
 	if (!$err) {	
 		$zip=editZipcode($control['db'], strtolower($_POST['city']), strtolower($_POST['county']), strtolower($_POST['state']), $_POST['zip']);
 		$err=$zip['errCode'];	
-	}	
+	}
 	
 	if (!$err)
 		if ( !empty($_POST['email']) && !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ) 
@@ -905,16 +919,18 @@ function updateContact() {
 				WHERE id =:id";
 						
 		$stmt= $control['db']->prepare($sql);
-		$stmt->execute($data);	
+		$stmt->execute($data);
+
+// 3-22-2021: v 4.1 update - only write to user log when input has no errors.	-mlr
+		$date = date('Y-m-d');
+		$time = date('H:i:s');		
+		writeUserLog( $control['db'], $date, $time, $control['hhID'], "household", $control['hhID'], "UPDATE CONTACT");	
+		
 	} else {
 		$control['formErr'] = "contact";
 		$control['errCode'] = $err;
 	}	
-	
-	$date = date('Y-m-d');
-	$time = date('H:i:s');		
-//	writeUserLog( $control['db'], $date, $time, $control['users_id'], $control['users_pantry_id'], "UPDATE HOUSEHOLD", $control['hhID'] );	
-	writeUserLog( $control['db'], $date, $time, $control['hhID'], "household", $control['hhID'], "UPDATE CONTACT");	
+
 }
 
 function deleteHousehold() {

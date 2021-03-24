@@ -17,6 +17,7 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
+ * 3-23-2021: v 4.1 update - to add contrast, pie chart colors are now calculated in a separate function.		-mlr
 */ 
 	$isPublic=0;
 	
@@ -67,7 +68,10 @@
 	if ( isset($_POST['drawChartBtn']) && $control['error'] == "" ) {
 		
 			$dateRows=addDataRows();	
-			$slices=addSlices();	
+			$slices=addSlices();
+// 3-23-2021: v 4.1 update - add function pieColors().		-mlr			
+			$colors=pieColors($control['numPantries']);
+			
     		echo "
 			<div id='chart_div' style='margin:0;padding:0;'></div>
 			<div id='pie_div' style='margin:0;padding:0;'></div>";
@@ -445,7 +449,7 @@ function addSlices() {
 	$sql = "SELECT * from pantries WHERE $pantryQ";
 	$stmt = $control['db']->prepare($sql);
 	$stmt->execute();	
-	$result = $stmt->fetchAll();	
+	$result = $stmt->fetchAll();
 	foreach($result as $pantries) {		
 		$count=0;
 		$sql2 = "SELECT * FROM consumption
@@ -470,14 +474,19 @@ function addSlices() {
 	
 	arsort($arr);
 	$firstRow=1;
-	$data="";	
+	$data="";
+	$numPantries = 0;	
 	foreach ($arr as $key => $val) {
 		if (!$firstRow)
 			$data.= ",\n";
 		$data.= '["' . $key . '",' . $val . ']';
-		$firstRow=0;			
-	}	
-	
+		$firstRow=0;
+		if ($val >0)
+			$numPantries++;	
+	}
+// 3-23-2021: v 4.1 update - count number of pantries in pie chart.	
+	$control['numPantries']=$numPantries;	
+
 	return $data;
 }	
 
@@ -514,19 +523,13 @@ function addSlices() {
 
 	function drawCurveTypes() {
 		
-
-		
-		
 		var data = new google.visualization.DataTable(); 
-	
 		
 		data.addColumn('date', 'Month');
 		data.addColumn('number', 'Visits');
 
 		data.addRows([
-
 			<?php echo $dateRows; ?>
-
 		]);
 
 		var options = {
@@ -544,7 +547,6 @@ function addSlices() {
 				textStyle : {fontSize: 16},
 				format: "<?php echo $control['hAxis']; ?>",
 
-
 		      ticks: [
 <?php
 				$isFirst=1;
@@ -555,7 +557,6 @@ function addSlices() {
 				}
 ?>
 		             ]
-
 			},
 
 			vAxis: {
@@ -626,15 +627,18 @@ function addSlices() {
 			is3D: true,
             height:600,
 			slices: [	
-				{color: '#ff6f00'},
-				{color: '#ff9a4d'},	
-				{color: '#ffad33'},		
-				{color: '#f87254'}, 
-				{color: '#da2e0b'},	
-				{color: '#841E14'},
-				{color: '#944dff'}, 
-				{color: '#4d94ff'},	
-				{color: '#33cc33'}											
+// 3-23-2021: v 4.1 update - to add contrast, colors are now calculated in a separate function.		-mlr			
+				<?php echo $colors; ?>	
+				
+//				{color: '#ff6f00'},
+//				{color: '#ff9a4d'},	
+//				{color: '#ffad33'},		
+//				{color: '#f87254'}, 
+//				{color: '#da2e0b'},	
+//				{color: '#841E14'},
+//				{color: '#944dff'}, 
+//				{color: '#4d94ff'},	
+//				{color: '#33cc33'}											
 			]				
 			
 		};
@@ -651,8 +655,6 @@ function addSlices() {
 		$(window).on('debouncedresize', function( event ) {
 	    chart.draw(data, options);
 		});\n";		
-		
-		
 ?>		
       }
 </script>
