@@ -17,6 +17,7 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
+ * 3-23-2021: v 4.1 update - add function pieColors().		-mlr
 */ 
 
 function getDB($config) {
@@ -1389,5 +1390,39 @@ function selectTimezone( $name, $value ) {
 	echo "value= 'US/Samoa'>US/Samoa</option>\n";	
 	
 	echo "</select>\n";	
+}
+
+function pieColors($numSlices) {
+	
+	$color=array();
+	$color[1]='#ff6f00';
+	$color[2]='#ff9a4d';
+	$color[3]='#ffad33';
+	$color[4]='#f87254';
+	$color[5]='#da2e0b';
+	$color[6]='#841E14';
+	$color[7]='#944dff';
+	$color[8]='#4d94ff';
+	$color[9]='#33cc33';
+
+// keep color array from going out of bounds	
+	if ($numSlices > 9)
+		$numSlices = 9;
+	
+// add contrast 	
+	if ($numSlices == 4)
+		$color[4] = $color[5];
+	
+	$isFirst=true;	
+	$data="";
+	for ($x = 1; $x <= $numSlices; $x++) {
+		if (!$isFirst)
+			$data.= ",\n";	
+		$data.= "{color:'" . $color[$x] . "'}";	
+		$isFirst=false;	
+	}	
+	
+	return $data;
 }	
+	
 ?>

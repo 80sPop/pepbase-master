@@ -17,8 +17,9 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
+ * 3-23-2021: v 4.1 update - to add contrast, pie chart colors are now calculated in a separate function.		-mlr
 */ 
-	$isPublic=1;
+	$isPublic=0;
 
 	require_once('../config.php'); 
 	require_once('../header.php'); 	
@@ -66,7 +67,10 @@
 	$slices="";
 	if ( isset($_POST['drawChartBtn']) && $control['error'] == "" ) {
 		
-			$slices=addSlices();	
+			$slices=addSlices();
+// 3-23-2021: v 4.1 update - add function pieColors().		-mlr			
+			$colors=pieColors($control['numPantries']);
+			
     		echo "
 			<div id='chart_div' style='margin:0;padding:0;'></div>
 			<div id='pie_div' style='margin:0;padding:0;'></div>";
@@ -456,16 +460,17 @@ function addSlices() {
 	arsort($arr);
 	$firstRow=1;
 	$data="";	
+	$numPantries = 0;	
 	foreach ($arr as $key => $val) {
 		if (!$firstRow)
 			$data.= ",\n";
-		
-// 9-17-2020: v 3.9.6 update - escape single quotes in pantry name.		-mlr		
-//		$data.= "['$key', " . $val . " ]";		
 		$data.= '["' . $key . '",' . $val . ']';		
-
-		$firstRow=0;			
+		$firstRow=0;
+		if ($val >0)
+			$numPantries++;			
 	}
+// 3-23-2021: v 4.1 update - count number of pantries in pie chart.	
+	$control['numPantries']=$numPantries;		
 	
 	return $data;
 }	
@@ -611,15 +616,17 @@ function addSlices() {
 			is3D: true,
             height:600,
 			slices: [	
-				{color: '#ff6f00'},
-				{color: '#ff9a4d'},	
-				{color: '#ffad33'},		
-				{color: '#f87254'}, 
-				{color: '#da2e0b'},	
-				{color: '#841E14'},
-				{color: '#944dff'}, 
-				{color: '#4d94ff'},	
-				{color: '#33cc33'}											
+// 3-23-2021: v 4.1 update - to add contrast, colors are now calculated in a separate function.		-mlr			
+				<?php echo $colors; ?>				
+//				{color: '#ff6f00'},
+//				{color: '#ff9a4d'},	
+//				{color: '#ffad33'},		
+//				{color: '#f87254'}, 
+//				{color: '#da2e0b'},	
+//				{color: '#841E14'},
+//				{color: '#944dff'}, 
+//				{color: '#4d94ff'},	
+//				{color: '#33cc33'}											
 			]			
 		
 		};

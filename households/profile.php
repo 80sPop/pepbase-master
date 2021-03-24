@@ -17,6 +17,8 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
+ * 3-22-2021: v 4.1 update - display household name in headings when updating literacy and
+ * 		and registration information .	-mlr	
 */ 
 
 
@@ -225,7 +227,8 @@ function literacyForm() {
 	if (isset($_POST['regliteracy']))	
 		$head="Literacy Information for household of <b>$values[fName]</b>";
 	else
-		$head="Edit Literacy Information";		
+// 3-22-2021: v 4.1 update - display household name in heading.	-mlr		
+		$head="Edit Literacy Information for household of <b>$values[fName]</b>";		
 ?>
 <div class="container-fluid bg-gray-2 m-0">
 <div class="container p-3">
@@ -330,7 +333,8 @@ function idForm() {
 	if ($control['isreg'])	
 		$head="Registration Information for household of <b>$values[fName]</b>";	
 	else
-		$head="Edit Registration Information";		
+// 3-22-2021: v 4.1 update - display household name in heading.	-mlr			
+		$head="Edit Registration Information for household of <b>$values[fName]</b>";		
 ?>
 <div class="container-fluid bg-gray-2 m-0">
 <div class="container p-3">
